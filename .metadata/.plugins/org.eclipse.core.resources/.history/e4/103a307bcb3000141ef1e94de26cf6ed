@@ -1,0 +1,120 @@
+package com.deco.service;
+
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Observable;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import com.deco.model.TeamModel;
+import com.deco.sql.TEAM;
+import android.content.Context;
+import android.os.AsyncTask;
+
+public class TeamImgService extends Observable{
+	private static Context _context;
+	
+	public TeamImgService(Context context) {
+		if (context != null)
+			_context = context;
+	}
+	
+	public void getImageFromId(String szTeamID){
+		new RequestTask().execute(szTeamID);
+	}
+	
+	class RequestTask extends AsyncTask<String, String, HashMap<String, String>>{
+	    @Override
+	    protected HashMap<String, String> doInBackground(String... params) {
+	    	HashMap<String, String> ret = new HashMap<String, String>();
+	    	String szTeamID = params[0];
+	    	String szFilePath = "team" + szTeamID + ".png";
+	    	ret.put("teamid", szTeamID);
+	    	
+	    	//File file = _context.getFileStreamPath(szFilePath);
+	    	//if(file.exists()){
+		    //    ret.put("result", "true");
+		    //    return ret;	    		
+	    	//}
+	    	
+	        File file = new File(szFilePath);
+	        // If file does not exists, then create it
+	        if (file.exists()) {
+			    ret.put("result", "true");
+			    return ret;
+	        }	
+	    	
+	        HttpClient httpclient = new DefaultHttpClient();
+	        HttpResponse response;
+	        String responseString = null;
+	        TeamModel mdlTeam = new TeamModel(_context);
+	        ArrayList<String> lsSelect = new ArrayList<String>();
+	        lsSelect.add(TEAM.avatar);
+	        HashMap<String, String> pTeamInfo = mdlTeam.getTeamById(szTeamID, lsSelect);
+	        String szAvatarUrl = pTeamInfo.get(TEAM.avatar); 
+	        if (szAvatarUrl == ""){
+	        	ret.put("result", "false");
+	        	return ret;
+	        }
+	        
+	        try {
+	            response = httpclient.execute(new HttpGet(szAvatarUrl));
+	            StatusLine statusLine = response.getStatusLine();
+	            if(statusLine.getStatusCode() == HttpStatus.SC_OK){
+	                ByteArrayOutputStream out = new ByteArrayOutputStream();
+	                response.getEntity().writeTo(out);
+	                out.close();
+	                responseString = out.toString();
+	            } else{
+	                response.getEntity().getContent().close();
+	                throw new IOException(statusLine.getReasonPhrase());
+	            }
+	        } catch (ClientProtocolException e) {
+	        	ret.put("result", "false");
+	        	return ret;
+	        } 
+	        catch (IOException e) {
+	        	ret.put("result", "false");
+	        	return ret;
+	        }
+	        
+	        
+	        try {
+	        	file.createNewFile();
+	            FileWriter fw = new FileWriter(szFilePath);
+	            BufferedWriter bw = new BufferedWriter(fw);
+	            bw.write(responseString);
+	            bw.close();	        	
+		        //FileOutputStream fos = _context.openFileOutput(szFilePath, _context.MODE_MULTI_PROCESS);
+		        //fos.write(responseString.getBytes());
+		        //fos.close(); 
+	        } catch (Exception e) {
+	        	e.printStackTrace();
+	        	ret.put("result", "false");
+	        	return ret;
+	        }
+	        
+	        ret.put("result", "true");
+	        return ret;
+	    }
+   
+	    
+	    @Override
+	    protected void onPostExecute(HashMap<String, String> result) {
+	        super.onPostExecute(result);
+			setChanged();
+			notifyObservers(result);	        
+	    }	   
+	}
+}

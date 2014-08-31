@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:clearTaskOnLaunch=true"">
+
+    <RelativeLayout android:id="@+id/userbar" 
+        android:layout_height="wrap_content" 
+        android:layout_width="fill_parent" 
+        android:layout_alignParentBottom="true"
+        android:paddingLeft="5dip"
+        android:background="#000">
+ 
+	    <ImageView
+	        android:id="@+id/useravatar"
+	        android:layout_width="40dip"
+	        android:layout_height="wrap_content"
+	        android:src="@drawable/ic_launcher"
+	        android:paddingRight="5dip"
+		/>
+	    
+	    <TextView
+	        android:id="@+id/username"
+	        android:text="Hoang Anh"
+	        android:layout_toRightOf="@id/useravatar"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:src="@drawable/ic_launcher"
+	        android:paddingTop="5dip"
+		/>
+	    
+	    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/username"
+	        android:layout_toRightOf="@id/useravatar"
+	        android:src="@drawable/ic_launcher"
+	        android:text="Update profile" />
+	            
+    </RelativeLayout>        
+    
+    <ListView  android:id="@+id/matchlist" 
+        android:layout_height="fill_parent" 
+        android:layout_width="fill_parent"
+        android:layout_above="@id/userbar"
+        android:background="#666666"/>
+</RelativeLayout>
