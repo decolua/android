@@ -15,9 +15,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.deco.model.MatchModel;
@@ -70,6 +74,9 @@ public class MatchActivity extends Activity {
         } catch (ParseException e) {
         }
 	    
+        // Set Odds List
+        setOddsList(1);
+        
 		// Set Image Avatar
 		TeamImgService svImage = new TeamImgService(this);
 		ImageWatcher wtcImage = new ImageWatcher();
@@ -84,16 +91,12 @@ public class MatchActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.match, menu);
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
 			return true;
@@ -114,6 +117,61 @@ public class MatchActivity extends Activity {
 		    return true;
 		}		
 		return false;
+	}
+	
+    public void clickFunc(View view){
+        int a = 1;
+        int b = 2;
+        b = a;
+        a = b;
+    }
+
+	
+	public void setOddsList(int nBetType){
+		LinearLayout column1 = (LinearLayout)this.findViewById(R.id.oddscolumn1);
+		LinearLayout column2 = (LinearLayout)this.findViewById(R.id.oddscolumn2);
+		LinearLayout column3 = (LinearLayout)this.findViewById(R.id.oddscolumn3);
+		
+		// Insert Column 1
+		for (int i=0; i<4; i++){
+			for (int j=0; j<3; j++){
+				View btnOdds = LayoutInflater.from(this).inflate(R.layout.odds_button, null);
+				TextView oddsresult = (TextView)btnOdds.findViewById(R.id.oddsresult);
+				String tmp = String.format("%d-%d", i+1, j);
+				oddsresult.setText(tmp);
+				TextView winback = (TextView)btnOdds.findViewById(R.id.winback);
+				winback.setText("1/20");
+				column1.addView(btnOdds);
+				if (j >= i)
+					break;
+			}
+		}
+		
+		// Insert Column 1
+		for (int i=0; i<3; i++){
+				View btnOdds = LayoutInflater.from(this).inflate(R.layout.odds_button, null);
+				TextView oddsresult = (TextView)btnOdds.findViewById(R.id.oddsresult);
+				String tmp = String.format("%d-%d", i, i);
+				oddsresult.setText(tmp);
+				TextView winback = (TextView)btnOdds.findViewById(R.id.winback);
+				winback.setText("1/20");
+				column2.addView(btnOdds);
+		}	
+		
+		// Insert Column 1
+		for (int i=0; i<4; i++){
+			for (int j=0; j<3; j++){
+				View btnOdds = LayoutInflater.from(this).inflate(R.layout.odds_button, null);
+				TextView oddsresult = (TextView)btnOdds.findViewById(R.id.oddsresult);
+				String tmp = String.format("%d-%d", j, i+1);
+				oddsresult.setText(tmp);
+				TextView winback = (TextView)btnOdds.findViewById(R.id.winback);
+				winback.setText("1/20");
+				column3.addView(btnOdds);
+				if (j >= i)
+					break;
+			}
+		}		
 	}
 	
 	class ImageWatcher implements Observer { 

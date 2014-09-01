@@ -115,7 +115,7 @@ public class MatchService extends Observable{
 					}
 					else{
 						int nStatus = Integer.parseInt(rsMatch.get(MATCH.status));
-						if (nStatus < 4){
+						if (nStatus < 5){
 							if (checkDataChanged(getObjValue(match, MATCH.home_goals),  rsMatch.get(MATCH.home_goals)))
 								values.put(MATCH.home_goals, getObjValue(match, MATCH.home_goals));
 
