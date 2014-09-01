@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -56,6 +57,9 @@ public class MatchActivity extends Activity {
 		TextView awayname = (TextView) findViewById(R.id.awayname);
 		homename.setText(szHomeName);
 		awayname.setText(szAwayName);
+		
+		TextView matchresult = (TextView) findViewById(R.id.matchresult);
+		matchresult.setBackgroundColor(Color.RED);
 		
 		// Set Time
         try {
