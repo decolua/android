@@ -3,7 +3,6 @@ package com.deco.football;
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Observable;
@@ -15,16 +14,20 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.deco.helper.Helper;
 import com.deco.model.MatchModel;
 import com.deco.service.TeamImgService;
 import com.deco.sql.MATCH;
@@ -33,6 +36,9 @@ public class MatchActivity extends Activity {
 	private String _szHomeId = "";
 	private String _szAwayId = "";
 	private Context _context = this; 
+	private int _handicap = 4;
+	private int _homeback = 90;
+	private int _awayback = 90;	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +64,6 @@ public class MatchActivity extends Activity {
 		homename.setText(szHomeName);
 		awayname.setText(szAwayName);
 		
-		TextView matchresult = (TextView) findViewById(R.id.matchresult);
-		matchresult.setBackgroundColor(Color.RED);
-		
 		// Set Time
         try {
 	    	String szDate = "";
@@ -79,7 +82,7 @@ public class MatchActivity extends Activity {
         }
 	    
         // Set Odds List
-        setOddsList(1);
+        setMatchResultOdds();
         
 		// Set Image Avatar
 		TeamImgService svImage = new TeamImgService(this);
@@ -123,60 +126,160 @@ public class MatchActivity extends Activity {
 		return false;
 	}
 	
-    public void clickFunc(View view){
-        int a = 1;
-        int b = 2;
-        b = a;
-        a = b;
-    }
-
+    public void onOddsBtnClick(View view){
+    	LinearLayout panel = (LinearLayout)findViewById(R.id.betpanel);
+    	panel.setVisibility(View.VISIBLE);
+    	
+    	Animation slide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
+    	panel.startAnimation(slide);
+    }		
 	
-	public void setOddsList(int nBetType){
+	public void onTabClick(View view){
+		LinearLayout tabs = (LinearLayout)findViewById(R.id.typetab);
+		for (int i=0; i<tabs.getChildCount(); i++){
+			TextView tab = (TextView)tabs.getChildAt(i);
+			tab.setTextColor(Color.parseColor("#666666"));
+			tab.setTypeface(null, Typeface.NORMAL);
+		}
+		
+		TextView curTab = (TextView)view;
+		curTab.setTextColor(Color.parseColor("#000000"));
+		curTab.setTypeface(null, Typeface.BOLD);
+		String tag = (String)curTab.getTag();
+		int nIndex = Integer.parseInt(tag);
+		switch (nIndex){
+		case 0:
+			setMatchResultOdds();
+			break;
+		case 1:
+			setCorrectScoreOdds();
+			break;
+		case 2:
+			setHandicapOdds();
+			break;			
+		}
+	}	
+	
+    public void setMatchResultOdds()
+    {
 		LinearLayout column1 = (LinearLayout)this.findViewById(R.id.oddscolumn1);
 		LinearLayout column2 = (LinearLayout)this.findViewById(R.id.oddscolumn2);
 		LinearLayout column3 = (LinearLayout)this.findViewById(R.id.oddscolumn3);
+		column1.removeAllViews();
+		column2.removeAllViews();
+		column3.removeAllViews();
 		
-		// Insert Column 1
-		for (int i=0; i<4; i++){
-			for (int j=0; j<3; j++){
-				View btnOdds = LayoutInflater.from(this).inflate(R.layout.odds_button, null);
-				TextView oddsresult = (TextView)btnOdds.findViewById(R.id.oddsresult);
-				String tmp = String.format("%d-%d", i+1, j);
-				oddsresult.setText(tmp);
-				TextView winback = (TextView)btnOdds.findViewById(R.id.winback);
-				winback.setText("1/20");
+		// Set Home Odds
+		View btnOdds = LayoutInflater.from(this).inflate(R.layout.match_odds_button, null);
+		TextView oddsresult = (TextView)btnOdds.findViewById(R.id.oddsresult);
+		oddsresult.setText("Home");
+		TextView winback = (TextView)btnOdds.findViewById(R.id.winback);
+		double dbOdds = Helper.genMatchResult(_handicap, _homeback, _awayback, 0);
+		winback.setText("1/" + String.valueOf(dbOdds));
+		column1.addView(btnOdds);	
+		
+		// Set Home Odds
+		btnOdds = LayoutInflater.from(this).inflate(R.layout.match_odds_button, null);
+		oddsresult = (TextView)btnOdds.findViewById(R.id.oddsresult);
+		oddsresult.setText("Draw");
+		winback = (TextView)btnOdds.findViewById(R.id.winback);
+		dbOdds = Helper.genMatchResult(_handicap, _homeback, _awayback, 2);
+		winback.setText("1/" + String.valueOf(dbOdds));
+		column2.addView(btnOdds);			
+		
+		// Set Away Odds
+		btnOdds = LayoutInflater.from(this).inflate(R.layout.match_odds_button, null);
+		oddsresult = (TextView)btnOdds.findViewById(R.id.oddsresult);
+		oddsresult.setText("Away");
+		winback = (TextView)btnOdds.findViewById(R.id.winback);
+		dbOdds = Helper.genMatchResult(_handicap, _homeback, _awayback, 1);
+		winback.setText("1/" + String.valueOf(dbOdds));
+		column3.addView(btnOdds);				
+    }    
+    
+    public void setHandicapOdds()
+    {
+		LinearLayout column1 = (LinearLayout)this.findViewById(R.id.oddscolumn1);
+		LinearLayout column2 = (LinearLayout)this.findViewById(R.id.oddscolumn2);
+		LinearLayout column3 = (LinearLayout)this.findViewById(R.id.oddscolumn3);
+		column1.removeAllViews();
+		column2.removeAllViews();
+		column3.removeAllViews();
+
+		// Set Home Odds
+		View btnOdds = LayoutInflater.from(this).inflate(R.layout.match_odds_button, null);
+		TextView oddsresult = (TextView)btnOdds.findViewById(R.id.oddsresult);
+		oddsresult.setText("Home");
+		TextView winback = (TextView)btnOdds.findViewById(R.id.winback);
+		double tmp = 1 + (double)_homeback / 100;
+		winback.setText("1/" + String.valueOf(tmp));
+		column1.addView(btnOdds);	
+		
+		// Set Away Odds
+		btnOdds = LayoutInflater.from(this).inflate(R.layout.match_odds_button, null);
+		oddsresult = (TextView)btnOdds.findViewById(R.id.oddsresult);
+		oddsresult.setText("Away");
+		winback = (TextView)btnOdds.findViewById(R.id.winback);
+		tmp = 1 + (double)_awayback / 100;
+		winback.setText("1/" + String.valueOf(tmp));
+		column3.addView(btnOdds);				
+    }
+    
+	public void setCorrectScoreOdds(){
+		LinearLayout column1 = (LinearLayout)this.findViewById(R.id.oddscolumn1);
+		LinearLayout column2 = (LinearLayout)this.findViewById(R.id.oddscolumn2);
+		LinearLayout column3 = (LinearLayout)this.findViewById(R.id.oddscolumn3);
+		column1.removeAllViews();
+		column2.removeAllViews();
+		column3.removeAllViews();
+		new LoadOdds().execute();
+	}	
+	
+	class LoadOdds extends AsyncTask<Integer, Integer, Integer>{
+	    @Override
+	    protected Integer doInBackground(Integer... input) {
+			for (int i=0; i<5; i++){
+				for (int j=0; j<5; j++){
+					Integer[] values = new Integer[] {i, j};
+					publishProgress(values);
+				}
+			}	    	
+	        return 0;
+	    }
+	    
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+    		LinearLayout column1 = (LinearLayout)findViewById(R.id.oddscolumn1);
+    		LinearLayout column2 = (LinearLayout)findViewById(R.id.oddscolumn2);
+    		LinearLayout column3 = (LinearLayout)findViewById(R.id.oddscolumn3);      
+    		int i = values[0];
+    		int j = values[1];
+    		
+			View btnOdds = LayoutInflater.from(_context).inflate(R.layout.match_odds_button, null);
+			TextView oddsresult = (TextView)btnOdds.findViewById(R.id.oddsresult);
+			String tmp = String.format("%d-%d", i, j);
+			oddsresult.setText(tmp);
+			TextView winback = (TextView)btnOdds.findViewById(R.id.winback);
+			
+			if (i > j && j < 3){
+				double dbOdds = Helper.genCorrectScore(_handicap, _homeback, _awayback, i, j);
+				winback.setText("1/" + String.valueOf((int)dbOdds));					
 				column1.addView(btnOdds);
-				if (j >= i)
-					break;
 			}
-		}
-		
-		// Insert Column 1
-		for (int i=0; i<3; i++){
-				View btnOdds = LayoutInflater.from(this).inflate(R.layout.odds_button, null);
-				TextView oddsresult = (TextView)btnOdds.findViewById(R.id.oddsresult);
-				String tmp = String.format("%d-%d", i, i);
-				oddsresult.setText(tmp);
-				TextView winback = (TextView)btnOdds.findViewById(R.id.winback);
-				winback.setText("1/20");
-				column2.addView(btnOdds);
-		}	
-		
-		// Insert Column 1
-		for (int i=0; i<4; i++){
-			for (int j=0; j<3; j++){
-				View btnOdds = LayoutInflater.from(this).inflate(R.layout.odds_button, null);
-				TextView oddsresult = (TextView)btnOdds.findViewById(R.id.oddsresult);
-				String tmp = String.format("%d-%d", j, i+1);
-				oddsresult.setText(tmp);
-				TextView winback = (TextView)btnOdds.findViewById(R.id.winback);
-				winback.setText("1/20");
+			
+			if (i < j && i < 3){
+				double dbOdds = Helper.genCorrectScore(_handicap, _homeback, _awayback, i, j);
+				winback.setText("1/" + String.valueOf((int)dbOdds));
 				column3.addView(btnOdds);
-				if (j >= i)
-					break;
 			}
-		}		
-	}
+				
+			if (i==j && i < 3){
+				double dbOdds = Helper.genCorrectScore(_handicap, _homeback, _awayback, i, j);
+				winback.setText("1/" + String.valueOf((int)dbOdds));
+				column2.addView(btnOdds);					
+			}    		
+        }	    
+	}		
 	
 	class ImageWatcher implements Observer { 
 		public void update(Observable obj, Object arg) {

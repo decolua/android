@@ -41,7 +41,7 @@ public class MatchAdapter extends ArrayAdapter<HashMap<String, String>> implemen
 
 	public View getView(int position, View v, ViewGroup parent){ 
 		if (lsMatch.size() < 2){
-			return mInflater.inflate(R.layout.league_item, null);
+			return mInflater.inflate(R.layout.living_league_item, null);
 		}
 		
 		HashMap<String, String> matchinfo = lsMatch.get(position);
@@ -80,7 +80,7 @@ public class MatchAdapter extends ArrayAdapter<HashMap<String, String>> implemen
 		    		v = null;
 		    	
 		    	if (v == null){
-		    		v = mInflater.inflate(R.layout.match_item, null);
+		    		v = mInflater.inflate(R.layout.living_match_item, null);
 					matchholder = new MatchHolder();
 					matchholder.row = (TableLayout)v.findViewById(R.id.listrow);
 					matchholder.time = (TextView)v.findViewById(R.id.time);
@@ -119,7 +119,7 @@ public class MatchAdapter extends ArrayAdapter<HashMap<String, String>> implemen
 		    		v = null;		
 		    	
 		    	if (v == null){				
-					v = mInflater.inflate(R.layout.league_item, null);
+					v = mInflater.inflate(R.layout.living_league_item, null);
 					leagueholder = new LeaguehHolder();
 					leagueholder.league_name = (TextView)v.findViewById(R.id.league_name);
 					v.setTag(leagueholder);
