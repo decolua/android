@@ -2,7 +2,7 @@ package com.deco.model;
 
 import java.lang.String;
 
-import com.deco.config.Database;
+import com.deco.config.DATABASE;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class MySQL extends SQLiteOpenHelper{
-	private static final int DATABASE_VERSION = Database.VERSION;
+	private static final int DATABASE_VERSION = DATABASE.VERSION;
     private static final String DATABASE_NAME = "football.db";		
 	
     public MySQL(Context context) {

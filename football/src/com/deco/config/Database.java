@@ -1,5 +1,5 @@
 package com.deco.config;
 
-public class Database {
+public class DATABASE {
 	public static int VERSION = 301;
 }

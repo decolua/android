@@ -52,6 +52,7 @@ public class UserModel extends MySQL{
 				  "`user_birthday` varchar(32) DEFAULT NULL," +
 				  "`user_country` varchar(32) DEFAULT NULL," +
 				  "`user_token` varchar(32) DEFAULT NULL," +
+				  "`user_avatar` varchar(128) DEFAULT NULL," +
 				  "`user_reg_time` varchar(32) DEFAULT NULL," +
 				  "`user_cash` int(11) NOT NULL DEFAULT '0'," +
 				  "`user_logged` int(11) NOT NULL DEFAULT '0'," +

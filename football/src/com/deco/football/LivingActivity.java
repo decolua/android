@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.deco.adapter.MatchAdapter;
+import com.deco.helper.Helper;
 import com.deco.model.MatchModel;
 import com.deco.model.UserModel;
 import com.deco.service.MatchService;
@@ -15,11 +16,18 @@ import com.deco.sql.MATCH;
 import com.deco.sql.USER;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class LivingActivity extends Activity {
 
@@ -35,11 +43,9 @@ public class LivingActivity extends Activity {
 		// Get Current User
 		UserModel mdlUser = new UserModel(this);
 		_pUser = mdlUser.getLastUser();
-		if (_pUser.size() == 0){
-			_pUser.put(USER.id, "17");
-			_pUser.put(USER.token, "0d5c0616c1cf21465fd406bbe6aa7846");
+		if (_pUser.size() > 0){
+			updateUserBar();
 		}
-		
 		
 		// ListView Match
 		ArrayList<HashMap<String, String>> lsMatch = new ArrayList<HashMap<String, String>>();
@@ -56,6 +62,24 @@ public class LivingActivity extends Activity {
 		myTimer = new Timer();
 		ComingMatchTimer getComingMatchTimer = new ComingMatchTimer();
 		myTimer.schedule(getComingMatchTimer, 2000, 60000);		
+	}
+	
+	public void updateUserBar()	{
+		LinearLayout userbar = (LinearLayout)this.findViewById(R.id.userbar);
+		userbar.removeAllViews();
+		View userinfo = LayoutInflater.from(this).inflate(R.layout.login_user_bar, null);
+		
+		LinearLayout.LayoutParams params = 
+				new LinearLayout.LayoutParams(
+		        ViewGroup.LayoutParams.MATCH_PARENT,
+		        ViewGroup.LayoutParams.MATCH_PARENT);
+		
+		userbar.addView(userinfo, params);
+		
+		TextView username = (TextView)this.findViewById(R.id.username);
+		username.setText(_pUser.get(USER.name));
+		TextView usercash = (TextView)this.findViewById(R.id.usercash);
+		usercash.setText("$ " + _pUser.get(USER.cash));
 	}
 	
 	public void updateListView(){
@@ -138,5 +162,18 @@ public class LivingActivity extends Activity {
 				return;
 			}			
 		} 
-	}		
+	}	
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		if(resultCode == 0){
+		    this.finish();
+		}		
+	}	
+	
+	public void onLoginBtnClick(View v){
+		Intent intent = new Intent(this, LoginActivity.class);
+		startActivity(intent);
+		finish();
+	}
 }
