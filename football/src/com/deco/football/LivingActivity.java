@@ -45,7 +45,7 @@ public class LivingActivity extends Activity {
 		_pUser = mdlUser.getLastUser();
 		if (_pUser.size() > 0){
 			updateUserBar();
-		}
+		} 
 		
 		// ListView Match
 		ArrayList<HashMap<String, String>> lsMatch = new ArrayList<HashMap<String, String>>();
