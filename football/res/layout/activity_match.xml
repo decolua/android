@@ -7,7 +7,7 @@
     android:paddingRight="15dip"
     android:paddingLeft="15dip"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="#DDD"    
+    android:background="#333"    
     tools:context="com.deco.football.MatchActivity" >
     
     <LinearLayout
@@ -28,8 +28,8 @@
 	            android:id="@+id/homeimg"
 		        android:layout_width="match_parent"  
 		        android:layout_height="130dip"  
-		        android:src="@drawable/team14"
 				android:scaleType="centerInside" 
+				android:src="@drawable/noimage"
 				android:contentDescription="@string/versus"    
 	            /> 
 	        <TextView
@@ -55,8 +55,8 @@
 	            android:id="@+id/awayimg"
 		        android:layout_width="match_parent"  
 		        android:layout_height="130dip"    
-		        android:src="@drawable/team16"
 				android:scaleType="centerInside"
+				android:src="@drawable/noimage"
 				android:contentDescription="@string/versus"   
 	            /> 
 	        <TextView
@@ -102,10 +102,11 @@
             android:layout_weight="0.4" 
             android:text="@string/match_result"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:gravity="left"
             android:clickable="true"
             android:onClick="onTabClick"
             android:textStyle="bold"  
+            android:textColor="#fff"
             android:tag="0"          
             />
         <TextView
@@ -116,7 +117,7 @@
             android:gravity="center"
             android:clickable="true"
             android:onClick="onTabClick"
-            android:textColor="#666666"
+            android:textColor="#aaa"
             android:tag="1"             
             />
         <TextView
@@ -124,10 +125,10 @@
             android:layout_weight="0.3" 
             android:text="@string/handicap"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:gravity="right"
             android:clickable="true"
             android:onClick="onTabClick"
-            android:textColor="#666666"
+            android:textColor="#aaa"
             android:tag="2"             
             />                
         </LinearLayout>
@@ -166,6 +167,10 @@
 	    </LinearLayout>  
     </ScrollView>   
     
-    <include layout="@layout/match_bet_panel" />
+    <include 
+        android:id="@+id/betpanel"
+        android:visibility="invisible"
+        layout="@layout/match_bet_panel" 
+        />
     
 </RelativeLayout>

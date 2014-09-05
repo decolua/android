@@ -111,7 +111,14 @@ public class UserModel extends MySQL{
     
     public int update(int nId, ContentValues values) {
     	return super.update(TABLE_NAME, KEY_ID, nId, values);
-    }  
+    }
+    
+    public void signOut(){
+    	SQLiteDatabase db = this.getWritableDatabase();
+	   	String szQuery = String.format("UPDATE %s SET user_logged=0", TABLE_NAME);
+	   	db.execSQL(szQuery);
+	   	db.close();  	
+    }
     
     public String getUserById(String szId){
     	SQLiteDatabase db = this.getReadableDatabase();

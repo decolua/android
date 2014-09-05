@@ -25,6 +25,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -41,11 +43,7 @@ public class LivingActivity extends Activity {
 		setContentView(R.layout.activity_living);
 		
 		// Get Current User
-		UserModel mdlUser = new UserModel(this);
-		_pUser = mdlUser.getLastUser();
-		if (_pUser.size() > 0){
-			updateUserBar();
-		} 
+		updateUserBar();
 		
 		// ListView Match
 		ArrayList<HashMap<String, String>> lsMatch = new ArrayList<HashMap<String, String>>();
@@ -65,21 +63,26 @@ public class LivingActivity extends Activity {
 	}
 	
 	public void updateUserBar()	{
-		LinearLayout userbar = (LinearLayout)this.findViewById(R.id.userbar);
-		userbar.removeAllViews();
-		View userinfo = LayoutInflater.from(this).inflate(R.layout.login_user_bar, null);
+		UserModel mdlUser = new UserModel(this);
+		_pUser = mdlUser.getLastUser();
+		if (_pUser.size() > 0){
+			LinearLayout userbar = (LinearLayout)this.findViewById(R.id.userbar);
+			userbar.removeAllViews();
+			View userinfo = LayoutInflater.from(this).inflate(R.layout.user_bar, null);
+			
+			LinearLayout.LayoutParams params = 
+					new LinearLayout.LayoutParams(
+			        ViewGroup.LayoutParams.MATCH_PARENT,
+			        ViewGroup.LayoutParams.MATCH_PARENT);
+			
+			userbar.addView(userinfo, params);
+			
+			TextView username = (TextView)this.findViewById(R.id.username);
+			username.setText(_pUser.get(USER.name));
+			TextView usercash = (TextView)this.findViewById(R.id.usercash);
+			usercash.setText("$ " + _pUser.get(USER.cash));
+		}
 		
-		LinearLayout.LayoutParams params = 
-				new LinearLayout.LayoutParams(
-		        ViewGroup.LayoutParams.MATCH_PARENT,
-		        ViewGroup.LayoutParams.MATCH_PARENT);
-		
-		userbar.addView(userinfo, params);
-		
-		TextView username = (TextView)this.findViewById(R.id.username);
-		username.setText(_pUser.get(USER.name));
-		TextView usercash = (TextView)this.findViewById(R.id.usercash);
-		usercash.setText("$ " + _pUser.get(USER.cash));
 	}
 	
 	public void updateListView(){
@@ -164,16 +167,44 @@ public class LivingActivity extends Activity {
 		} 
 	}	
 	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		if(resultCode == 0){
-		    this.finish();
-		}		
-	}	
-	
 	public void onLoginBtnClick(View v){
 		Intent intent = new Intent(this, LoginActivity.class);
 		startActivity(intent);
 		finish();
 	}
+	
+	public void onLogoutBtnClick(View v){
+		UserModel mdlUser = new UserModel(this);
+		mdlUser.signOut();
+		
+		LinearLayout userbar = (LinearLayout)this.findViewById(R.id.userbar);
+		userbar.removeAllViews();
+		View userinfo = LayoutInflater.from(this).inflate(R.layout.login_bar, null);
+		
+		LinearLayout.LayoutParams params = 
+				new LinearLayout.LayoutParams(
+		        ViewGroup.LayoutParams.MATCH_PARENT,
+		        ViewGroup.LayoutParams.MATCH_PARENT);
+		
+		userbar.addView(userinfo, params);
+    	LinearLayout panel = (LinearLayout)findViewById(R.id.userprofile);
+    	Animation slide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.close_down);
+    	panel.startAnimation(slide);		    	
+    	panel.setVisibility(View.INVISIBLE);	
+	}
+	
+	public void onUserBtnClick(View v){
+    	LinearLayout panel = (LinearLayout)findViewById(R.id.userprofile);
+    	panel.setVisibility(View.VISIBLE);
+    	Animation slide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
+    	panel.startAnimation(slide);				
+	}	
+
+	public void onCloseBtnClick(View v){
+    	LinearLayout panel = (LinearLayout)findViewById(R.id.userprofile);
+    	Animation slide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.close_down);
+    	panel.startAnimation(slide);		    	
+    	panel.setVisibility(View.INVISIBLE);
+	}		
+	
 }

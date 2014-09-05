@@ -19,4 +19,6 @@
         android:layout_width="fill_parent"
         android:layout_above="@id/userbar"
         android:background="#666666"/>
+    
+    <include layout="@layout/user_profile_panel"/>
 </RelativeLayout>
